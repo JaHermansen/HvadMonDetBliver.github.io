@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gender Reveal Bookmaker Live</title>
+<title>Spil på Antons barn og vind store præmier!</title>
 <style>
   body { 
     font-family: Arial, sans-serif; 
@@ -46,7 +46,7 @@
     to { transform: translateY(500px) rotate(360deg); opacity: 0; }
   }
 
-  /* Background shapes */
+  /* Baggrundsfigurer */
   .bg-shape {
     position: absolute;
     border-radius: 50%;
@@ -58,7 +58,7 @@
     100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
   }
 
-  /* Floating sayings */
+  /* Flydende ordsprog */
   .floating-saying {
     position: absolute;
     font-size: 1.2em;
@@ -81,7 +81,7 @@
     position: relative;
   }
 
-  /* Betting banners */
+  /* Betting bannere */
   .banner {
     font-size: 1.5em;
     font-weight: bold;
@@ -99,23 +99,23 @@
 </head>
 <body>
 
-<h1>🎉 Gender Reveal Bookmaker 🎉</h1>
-<h2>Bet on Pink or Blue!</h2>
+<h1>🎉 Spil på Antons barn og vind store præmier! 🎉</h1>
+<h2>Gæt på dreng eller pige!</h2>
 
-<div class="banner">Put your imaginary money NOW! 💰</div>
+<div class="banner">Sæt dine fiktive penge NU! 💰</div>
 
-<button onclick="vote('boy', event)">💙 Bet on Boy</button>
-<button onclick="vote('girl', event)">💖 Bet on Girl</button>
-<button onclick="resetVotes()">🔄 Reset Votes</button>
+<button onclick="vote('boy', event)">💙 Spil på Dreng</button>
+<button onclick="vote('girl', event)">💖 Spil på Pige</button>
+<button onclick="resetVotes()">🔄 Nulstil Stemmer</button>
 
 <div id="results">
-  Boys: <span id="boy-count">0</span> |
-  Girls: <span id="girl-count">0</span> |
-  Total Votes: <span id="total-count">0</span>
+  Drenges stemmer: <span id="boy-count">0</span> |
+  Piges stemmer: <span id="girl-count">0</span> |
+  Samlet antal stemmer: <span id="total-count">0</span>
 </div>
 
 <div id="odds-display">
-  Odds: 💙 Boy: <span id="boy-odds">1.0</span> | 💖 Girl: <span id="girl-odds">1.0</span>
+  Odds: 💙 Dreng: <span id="boy-odds">1.0</span> | 💖 Pige: <span id="girl-odds">1.0</span>
 </div>
 
 <canvas id="oddsChart" width="500" height="200"></canvas>
@@ -164,7 +164,7 @@ function vote(gender, event) {
 
 // Password-protected reset
 function resetVotes() {
-  const input = prompt("Enter password to reset votes:");
+  const input = prompt("Indtast adgangskode for at nulstille stemmer:");
   if (input === PASSWORD) {
     votes.boy = 0;
     votes.girl = 0;
@@ -175,14 +175,14 @@ function resetVotes() {
     oddsHistory.girl = [];
     targetOdds.boy = 1;
     targetOdds.girl = 1;
-    alert("Votes have been reset!");
+    alert("Stemmerne er nulstillet!");
     updateBackgroundColors();
   } else {
-    alert("Wrong password! ❌");
+    alert("Forkert adgangskode! ❌");
   }
 }
 
-// Background shapes reacting to vote trend
+// Baggrundsfigurer der reagerer på stemmetendenser
 function createBackgroundShapes() {
   for (let i = 0; i < 30; i++) {
     const shape = document.createElement('div');
@@ -204,7 +204,7 @@ function updateBackgroundColors() {
   });
 }
 
-// Floating Danish sayings
+// Flydende danske ordsprog
 const sayings = [
   "Uha hvad mon det bliver?",
   "Kommer der en mand ind, kommer der en mand ud",
@@ -225,7 +225,7 @@ function createFloatingSayings() {
   });
 }
 
-// Odds calculation & trending chart
+// Oddsberegning & trending diagram
 let oddsHistory = { boy: [], girl: [] };
 let currentOdds = { boy: 1, girl: 1 };
 let targetOdds = { boy: 1, girl: 1 };
@@ -271,7 +271,7 @@ function drawLine(history, color) {
   ctx.beginPath();
   history.forEach((val, i) => {
     const x = i / 100 * canvas.width;
-    const y = canvas.height - (val / 5 * canvas.height); // normalize
+    const y = canvas.height - (val / 5 * canvas.height);
     if(i===0) ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   });
