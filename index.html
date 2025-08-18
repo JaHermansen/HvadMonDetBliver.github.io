@@ -67,6 +67,8 @@
 </div>
 
 <script>
+  const PASSWORD = "KunDrenge";
+
   const votes = {
     boy: parseInt(localStorage.getItem('boy')) || 0,
     girl: parseInt(localStorage.getItem('girl')) || 0
@@ -103,11 +105,17 @@
   }
 
   function resetVotes() {
-    votes.boy = 0;
-    votes.girl = 0;
-    localStorage.setItem('boy', 0);
-    localStorage.setItem('girl', 0);
-    updateResults();
+    const input = prompt("Enter password to reset votes:");
+    if (input === PASSWORD) {
+      votes.boy = 0;
+      votes.girl = 0;
+      localStorage.setItem('boy', 0);
+      localStorage.setItem('girl', 0);
+      updateResults();
+      alert("Votes have been reset!");
+    } else {
+      alert("Wrong password! ❌");
+    }
   }
 
   // Create floating background shapes
