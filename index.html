@@ -5,19 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gender Reveal Vote</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-  button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
-  #results { margin-top: 30px; font-size: 20px; }
+  body { 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    padding: 50px; 
+    position: relative; 
+    overflow: hidden; 
+    background: #fff;
+  }
+  button { 
+    padding: 10px 20px; 
+    font-size: 18px; 
+    margin: 10px; 
+    cursor: pointer; 
+    z-index: 2;
+    position: relative;
+  }
+  #results { 
+    margin-top: 30px; 
+    font-size: 20px; 
+    z-index: 2;
+    position: relative;
+  }
   .confetti { 
     position: absolute; 
     width: 10px; 
     height: 10px; 
-    background-color: red; 
     pointer-events: none;
     animation: fall 1s linear forwards;
+    z-index: 2;
   }
   @keyframes fall {
     to { transform: translateY(500px) rotate(360deg); opacity: 0; }
+  }
+
+  /* Funny background animation */
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: float 10s linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
+    100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
   }
 </style>
 </head>
@@ -25,8 +56,8 @@
 <h1>What's the Gender?</h1>
 <p>Cast your vote!</p>
 
-<button onclick="vote('boy')">💙 Boy</button>
-<button onclick="vote('girl')">💖 Girl</button>
+<button onclick="vote('boy', event)">💙 Boy</button>
+<button onclick="vote('girl', event)">💖 Girl</button>
 
 <div id="results">
   Boys: <span id="boy-count">0</span> |
@@ -50,26 +81,42 @@
     totalCountEl.textContent = votes.boy + votes.girl;
   }
 
-  function vote(gender) {
+  function vote(gender, event) {
     votes[gender]++;
     localStorage.setItem(gender, votes[gender]);
     updateResults();
-    triggerConfetti();
+    triggerConfetti(event);
   }
 
-  function triggerConfetti() {
+  function triggerConfetti(event) {
     for (let i = 0; i < 30; i++) {
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
       confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-      confetti.style.left = Math.random() * window.innerWidth + 'px';
-      confetti.style.top = '0px';
+      confetti.style.left = (event.clientX + Math.random() * 50 - 25) + 'px';
+      confetti.style.top = (event.clientY + Math.random() * 50 - 25) + 'px';
+      confetti.style.width = confetti.style.height = (5 + Math.random() * 10) + 'px';
       document.body.appendChild(confetti);
       setTimeout(() => confetti.remove(), 1000);
     }
   }
 
+  // Create floating background shapes
+  function createBackgroundShapes() {
+    for (let i = 0; i < 20; i++) {
+      const shape = document.createElement('div');
+      shape.className = 'bg-shape';
+      shape.style.width = shape.style.height = (20 + Math.random() * 40) + 'px';
+      shape.style.backgroundColor = Math.random() > 0.5 ? 'pink' : 'lightblue';
+      shape.style.left = Math.random() * window.innerWidth + 'px';
+      shape.style.top = Math.random() * window.innerHeight + 'px';
+      shape.style.animationDuration = (5 + Math.random() * 10) + 's';
+      document.body.appendChild(shape);
+    }
+  }
+
   updateResults();
+  createBackgroundShapes();
 </script>
 </body>
 </html>
