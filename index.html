@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gender Reveal Bookmaker</title>
+<title>Gender Reveal Bookmaker Live</title>
 <style>
   body { 
     font-family: Arial, sans-serif; 
@@ -119,7 +119,7 @@ function vote(gender, event) {
   localStorage.setItem(gender, votes[gender]);
   updateResults();
   triggerConfetti(event);
-  updateOdds();
+  generateTargetOdds();
 }
 
 // Password-protected reset
@@ -133,7 +133,8 @@ function resetVotes() {
     updateResults();
     oddsHistory.boy = [];
     oddsHistory.girl = [];
-    updateOdds();
+    targetOdds.boy = 1;
+    targetOdds.girl = 1;
     alert("Votes have been reset!");
   } else {
     alert("Wrong password! ❌");
@@ -156,27 +157,38 @@ function createBackgroundShapes() {
 
 // Odds calculation & trending chart
 let oddsHistory = { boy: [], girl: [] };
+let currentOdds = { boy: 1, girl: 1 };
+let targetOdds = { boy: 1, girl: 1 };
 
-function updateOdds() {
+function generateTargetOdds() {
   const total = votes.boy + votes.girl;
   if(total === 0) return;
 
-  // Simple bookmaker odds with random fluctuation
-  let boyOdd = ((total / votes.boy) || 1) * (0.9 + Math.random() * 0.2);
-  let girlOdd = ((total / votes.girl) || 1) * (0.9 + Math.random() * 0.2);
+  // Imaginary bookmaker calculation with random fluctuation
+  targetOdds.boy = ((total / votes.boy) || 1) * (0.9 + Math.random() * 0.2);
+  targetOdds.girl = ((total / votes.girl) || 1) * (0.9 + Math.random() * 0.2);
+}
 
-  document.getElementById('boy-odds').textContent = boyOdd.toFixed(2);
-  document.getElementById('girl-odds').textContent = girlOdd.toFixed(2);
+// Smooth odds animation
+function animateOdds() {
+  const smoothing = 0.05; // how fast odds approach target
+  currentOdds.boy += (targetOdds.boy - currentOdds.boy) * smoothing;
+  currentOdds.girl += (targetOdds.girl - currentOdds.girl) * smoothing;
 
-  oddsHistory.boy.push(boyOdd);
-  oddsHistory.girl.push(girlOdd);
+  document.getElementById('boy-odds').textContent = currentOdds.boy.toFixed(2);
+  document.getElementById('girl-odds').textContent = currentOdds.girl.toFixed(2);
 
-  if(oddsHistory.boy.length > 50) { // keep last 50 points
+  // Store for chart
+  oddsHistory.boy.push(currentOdds.boy);
+  oddsHistory.girl.push(currentOdds.girl);
+
+  if(oddsHistory.boy.length > 100) {
     oddsHistory.boy.shift();
     oddsHistory.girl.shift();
   }
 
   drawOddsChart();
+  requestAnimationFrame(animateOdds);
 }
 
 function drawOddsChart() {
@@ -212,7 +224,8 @@ function drawOddsChart() {
 // Initialize app
 updateResults();
 createBackgroundShapes();
-updateOdds();
+generateTargetOdds();
+animateOdds();
 </script>
 </body>
 </html>
