@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,6 +56,22 @@
   @keyframes float {
     0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
     100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
+  }
+
+  /* Floating sayings */
+  .floating-saying {
+    position: absolute;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: rgba(0,0,0,0.2);
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    animation: floatSaying linear infinite;
+  }
+  @keyframes floatSaying {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(110vw); }
   }
 
   canvas { 
@@ -188,6 +204,27 @@ function updateBackgroundColors() {
   });
 }
 
+// Floating Danish sayings
+const sayings = [
+  "Uha hvad mon det bliver?",
+  "Kommer der en mand ind, kommer der en mand ud",
+  "Kun rigtige mænd får drenge",
+  "Hvem gætter rigtigt?",
+  "Pink eller blå, gæt med!"
+];
+
+function createFloatingSayings() {
+  sayings.forEach(text => {
+    const span = document.createElement('div');
+    span.className = 'floating-saying';
+    span.textContent = text;
+    span.style.top = Math.random() * window.innerHeight + 'px';
+    span.style.animationDuration = (20 + Math.random()*20) + 's';
+    span.style.fontSize = (16 + Math.random()*20) + 'px';
+    document.body.appendChild(span);
+  });
+}
+
 // Odds calculation & trending chart
 let oddsHistory = { boy: [], girl: [] };
 let currentOdds = { boy: 1, girl: 1 };
@@ -216,46 +253,40 @@ function animateOdds() {
     oddsHistory.girl.shift();
   }
 
-  drawOddsChart();
+  drawChart();
   requestAnimationFrame(animateOdds);
 }
 
-function drawOddsChart() {
-  const canvas = document.getElementById('oddsChart');
-  const ctx = canvas.getContext('2d');
+// Simple canvas line chart
+const canvas = document.getElementById('oddsChart');
+const ctx = canvas.getContext('2d');
+
+function drawChart() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawLine(oddsHistory.boy, 'blue');
+  drawLine(oddsHistory.girl, 'pink');
+}
 
-  const allOdds = oddsHistory.boy.concat(oddsHistory.girl);
-  const maxOdd = Math.max(...allOdds) * 1.2;
-  const minOdd = Math.min(...allOdds) * 0.8;
-
-  // Boy line
+function drawLine(history, color) {
   ctx.beginPath();
-  ctx.strokeStyle = 'blue';
-  oddsHistory.boy.forEach((o, i) => {
-    const x = (i / oddsHistory.boy.length) * canvas.width;
-    const y = canvas.height - ((o - minOdd)/(maxOdd - minOdd)) * canvas.height;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  history.forEach((val, i) => {
+    const x = i / 100 * canvas.width;
+    const y = canvas.height - (val / 5 * canvas.height); // normalize
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
   });
-  ctx.stroke();
-
-  // Girl line
-  ctx.beginPath();
-  ctx.strokeStyle = 'pink';
-  oddsHistory.girl.forEach((o, i) => {
-    const x = (i / oddsHistory.girl.length) * canvas.width;
-    const y = canvas.height - ((o - minOdd)/(maxOdd - minOdd)) * canvas.height;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
   ctx.stroke();
 }
 
-// Initialize app
+// Initialize
 updateResults();
 createBackgroundShapes();
 updateBackgroundColors();
-generateTargetOdds();
+createFloatingSayings();
 animateOdds();
 </script>
+
 </body>
 </html>
