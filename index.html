@@ -13,6 +13,10 @@
     overflow: hidden; 
     background: #fff;
   }
+
+  h1 { font-size: 2em; margin-bottom: 5px; }
+  h2 { color: #555; margin-bottom: 20px; }
+
   button { 
     padding: 10px 20px; 
     font-size: 18px; 
@@ -21,12 +25,14 @@
     z-index: 2;
     position: relative;
   }
-  #results { 
+
+  #results, #odds-display {
     margin-top: 20px; 
     font-size: 20px; 
     z-index: 2;
     position: relative;
   }
+
   .confetti { 
     position: absolute; 
     width: 10px; 
@@ -35,6 +41,7 @@
     animation: fall 1s linear forwards;
     z-index: 2;
   }
+
   @keyframes fall {
     to { transform: translateY(500px) rotate(360deg); opacity: 0; }
   }
@@ -58,14 +65,31 @@
     position: relative;
   }
 
+  /* Betting banners */
+  .banner {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #ff69b4, #1e90ff);
+    border-radius: 15px;
+    margin: 10px auto;
+    display: inline-block;
+    z-index: 2;
+    position: relative;
+  }
+
 </style>
 </head>
 <body>
-<h1>What's the Gender?</h1>
-<p>Cast your vote!</p>
 
-<button onclick="vote('boy', event)">💙 Boy</button>
-<button onclick="vote('girl', event)">💖 Girl</button>
+<h1>🎉 Gender Reveal Bookmaker 🎉</h1>
+<h2>Bet on Pink or Blue!</h2>
+
+<div class="banner">Put your imaginary money NOW! 💰</div>
+
+<button onclick="vote('boy', event)">💙 Bet on Boy</button>
+<button onclick="vote('girl', event)">💖 Bet on Girl</button>
 <button onclick="resetVotes()">🔄 Reset Votes</button>
 
 <div id="results">
@@ -74,7 +98,7 @@
   Total Votes: <span id="total-count">0</span>
 </div>
 
-<div>
+<div id="odds-display">
   Odds: 💙 Boy: <span id="boy-odds">1.0</span> | 💖 Girl: <span id="girl-odds">1.0</span>
 </div>
 
@@ -83,7 +107,6 @@
 <script>
 const PASSWORD = "KunDrenge";
 
-// Load votes from localStorage
 const votes = {
   boy: parseInt(localStorage.getItem('boy')) || 0,
   girl: parseInt(localStorage.getItem('girl')) || 0
@@ -120,6 +143,7 @@ function vote(gender, event) {
   updateResults();
   triggerConfetti(event);
   generateTargetOdds();
+  updateBackgroundColors();
 }
 
 // Password-protected reset
@@ -136,23 +160,32 @@ function resetVotes() {
     targetOdds.boy = 1;
     targetOdds.girl = 1;
     alert("Votes have been reset!");
+    updateBackgroundColors();
   } else {
     alert("Wrong password! ❌");
   }
 }
 
-// Background shapes
+// Background shapes reacting to vote trend
 function createBackgroundShapes() {
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 30; i++) {
     const shape = document.createElement('div');
     shape.className = 'bg-shape';
     shape.style.width = shape.style.height = (20 + Math.random() * 40) + 'px';
-    shape.style.backgroundColor = Math.random() > 0.5 ? 'pink' : 'lightblue';
     shape.style.left = Math.random() * window.innerWidth + 'px';
     shape.style.top = Math.random() * window.innerHeight + 'px';
     shape.style.animationDuration = (5 + Math.random() * 10) + 's';
     document.body.appendChild(shape);
   }
+}
+
+function updateBackgroundColors() {
+  const shapes = document.querySelectorAll('.bg-shape');
+  const total = votes.boy + votes.girl || 1;
+  const boyRatio = votes.boy / total;
+  shapes.forEach(shape => {
+    shape.style.backgroundColor = Math.random() < boyRatio ? 'lightblue' : 'pink';
+  });
 }
 
 // Odds calculation & trending chart
@@ -163,22 +196,18 @@ let targetOdds = { boy: 1, girl: 1 };
 function generateTargetOdds() {
   const total = votes.boy + votes.girl;
   if(total === 0) return;
-
-  // Imaginary bookmaker calculation with random fluctuation
   targetOdds.boy = ((total / votes.boy) || 1) * (0.9 + Math.random() * 0.2);
   targetOdds.girl = ((total / votes.girl) || 1) * (0.9 + Math.random() * 0.2);
 }
 
-// Smooth odds animation
 function animateOdds() {
-  const smoothing = 0.05; // how fast odds approach target
+  const smoothing = 0.05;
   currentOdds.boy += (targetOdds.boy - currentOdds.boy) * smoothing;
   currentOdds.girl += (targetOdds.girl - currentOdds.girl) * smoothing;
 
   document.getElementById('boy-odds').textContent = currentOdds.boy.toFixed(2);
   document.getElementById('girl-odds').textContent = currentOdds.girl.toFixed(2);
 
-  // Store for chart
   oddsHistory.boy.push(currentOdds.boy);
   oddsHistory.girl.push(currentOdds.girl);
 
@@ -224,6 +253,7 @@ function drawOddsChart() {
 // Initialize app
 updateResults();
 createBackgroundShapes();
+updateBackgroundColors();
 generateTargetOdds();
 animateOdds();
 </script>
