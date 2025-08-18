@@ -1,50 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gender Reveal Vote</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-    button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
-    #results { margin-top: 30px; font-size: 20px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gender Reveal Vote</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+  button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
+  #results { margin-top: 30px; font-size: 20px; }
+  .confetti { 
+    position: absolute; 
+    width: 10px; 
+    height: 10px; 
+    background-color: red; 
+    pointer-events: none;
+    animation: fall 1s linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(500px) rotate(360deg); opacity: 0; }
+  }
+</style>
 </head>
 <body>
-  <h1>What's the Gender?</h1>
-  <p>Cast your vote!</p>
-  
-  <button onclick="vote('boy')">💙 Boy</button>
-  <button onclick="vote('girl')">💖 Girl</button>
-  
-  <div id="results">
-    Boys: <span id="boy-count">0</span> |
-    Girls: <span id="girl-count">0</span>
-  </div>
+<h1>What's the Gender?</h1>
+<p>Cast your vote!</p>
 
-  <script>
-    // Load existing votes from localStorage
-    const votes = {
-      boy: parseInt(localStorage.getItem('boy')) || 0,
-      girl: parseInt(localStorage.getItem('girl')) || 0
-    };
+<button onclick="vote('boy')">💙 Boy</button>
+<button onclick="vote('girl')">💖 Girl</button>
 
-    const boyCountEl = document.getElementById('boy-count');
-    const girlCountEl = document.getElementById('girl-count');
+<div id="results">
+  Boys: <span id="boy-count">0</span> |
+  Girls: <span id="girl-count">0</span> |
+  Total Votes: <span id="total-count">0</span>
+</div>
 
-    function updateResults() {
-      boyCountEl.textContent = votes.boy;
-      girlCountEl.textContent = votes.girl;
-    }
+<script>
+  const votes = {
+    boy: parseInt(localStorage.getItem('boy')) || 0,
+    girl: parseInt(localStorage.getItem('girl')) || 0
+  };
 
-    function vote(gender) {
-      votes[gender]++;
-      localStorage.setItem(gender, votes[gender]);
-      updateResults();
-      alert(`Thanks for voting ${gender === 'boy' ? '💙Boy' : '💖Girl'}!`);
-    }
+  const boyCountEl = document.getElementById('boy-count');
+  const girlCountEl = document.getElementById('girl-count');
+  const totalCountEl = document.getElementById('total-count');
 
+  function updateResults() {
+    boyCountEl.textContent = votes.boy;
+    girlCountEl.textContent = votes.girl;
+    totalCountEl.textContent = votes.boy + votes.girl;
+  }
+
+  function vote(gender) {
+    votes[gender]++;
+    localStorage.setItem(gender, votes[gender]);
     updateResults();
-  </script>
+    triggerConfetti();
+  }
+
+  function triggerConfetti() {
+    for (let i = 0; i < 30; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      confetti.style.top = '0px';
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 1000);
+    }
+  }
+
+  updateResults();
+</script>
 </body>
 </html>
