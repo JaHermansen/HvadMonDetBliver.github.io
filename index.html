@@ -39,7 +39,7 @@
     to { transform: translateY(500px) rotate(360deg); opacity: 0; }
   }
 
-  /* Funny background animation */
+  /* Background shapes */
   .bg-shape {
     position: absolute;
     border-radius: 50%;
@@ -58,6 +58,7 @@
 
 <button onclick="vote('boy', event)">💙 Boy</button>
 <button onclick="vote('girl', event)">💖 Girl</button>
+<button onclick="resetVotes()">🔄 Reset Votes</button>
 
 <div id="results">
   Boys: <span id="boy-count">0</span> |
@@ -99,6 +100,14 @@
       document.body.appendChild(confetti);
       setTimeout(() => confetti.remove(), 1000);
     }
+  }
+
+  function resetVotes() {
+    votes.boy = 0;
+    votes.girl = 0;
+    localStorage.setItem('boy', 0);
+    localStorage.setItem('girl', 0);
+    updateResults();
   }
 
   // Create floating background shapes
