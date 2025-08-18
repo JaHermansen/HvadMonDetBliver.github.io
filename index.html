@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gender Reveal Vote</title>
+<title>Gender Reveal Bookmaker</title>
 <style>
   body { 
     font-family: Arial, sans-serif; 
@@ -22,7 +22,7 @@
     position: relative;
   }
   #results { 
-    margin-top: 30px; 
+    margin-top: 20px; 
     font-size: 20px; 
     z-index: 2;
     position: relative;
@@ -50,6 +50,14 @@
     0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
     100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
   }
+
+  canvas { 
+    border: 1px solid #ccc; 
+    margin-top: 20px; 
+    z-index: 1;
+    position: relative;
+  }
+
 </style>
 </head>
 <body>
@@ -66,74 +74,145 @@
   Total Votes: <span id="total-count">0</span>
 </div>
 
+<div>
+  Odds: 💙 Boy: <span id="boy-odds">1.0</span> | 💖 Girl: <span id="girl-odds">1.0</span>
+</div>
+
+<canvas id="oddsChart" width="500" height="200"></canvas>
+
 <script>
-  const PASSWORD = "KunDrenge";
+const PASSWORD = "KunDrenge";
 
-  const votes = {
-    boy: parseInt(localStorage.getItem('boy')) || 0,
-    girl: parseInt(localStorage.getItem('girl')) || 0
-  };
+// Load votes from localStorage
+const votes = {
+  boy: parseInt(localStorage.getItem('boy')) || 0,
+  girl: parseInt(localStorage.getItem('girl')) || 0
+};
 
-  const boyCountEl = document.getElementById('boy-count');
-  const girlCountEl = document.getElementById('girl-count');
-  const totalCountEl = document.getElementById('total-count');
+const boyCountEl = document.getElementById('boy-count');
+const girlCountEl = document.getElementById('girl-count');
+const totalCountEl = document.getElementById('total-count');
 
-  function updateResults() {
-    boyCountEl.textContent = votes.boy;
-    girlCountEl.textContent = votes.girl;
-    totalCountEl.textContent = votes.boy + votes.girl;
+function updateResults() {
+  boyCountEl.textContent = votes.boy;
+  girlCountEl.textContent = votes.girl;
+  totalCountEl.textContent = votes.boy + votes.girl;
+}
+
+// Confetti animation
+function triggerConfetti(event) {
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    confetti.style.left = (event.clientX + Math.random() * 50 - 25) + 'px';
+    confetti.style.top = (event.clientY + Math.random() * 50 - 25) + 'px';
+    confetti.style.width = confetti.style.height = (5 + Math.random() * 10) + 'px';
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 1000);
   }
+}
 
-  function vote(gender, event) {
-    votes[gender]++;
-    localStorage.setItem(gender, votes[gender]);
-    updateResults();
-    triggerConfetti(event);
-  }
-
-  function triggerConfetti(event) {
-    for (let i = 0; i < 30; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-      confetti.style.left = (event.clientX + Math.random() * 50 - 25) + 'px';
-      confetti.style.top = (event.clientY + Math.random() * 50 - 25) + 'px';
-      confetti.style.width = confetti.style.height = (5 + Math.random() * 10) + 'px';
-      document.body.appendChild(confetti);
-      setTimeout(() => confetti.remove(), 1000);
-    }
-  }
-
-  function resetVotes() {
-    const input = prompt("Enter password to reset votes:");
-    if (input === PASSWORD) {
-      votes.boy = 0;
-      votes.girl = 0;
-      localStorage.setItem('boy', 0);
-      localStorage.setItem('girl', 0);
-      updateResults();
-      alert("Votes have been reset!");
-    } else {
-      alert("Wrong password! ❌");
-    }
-  }
-
-  // Create floating background shapes
-  function createBackgroundShapes() {
-    for (let i = 0; i < 20; i++) {
-      const shape = document.createElement('div');
-      shape.className = 'bg-shape';
-      shape.style.width = shape.style.height = (20 + Math.random() * 40) + 'px';
-      shape.style.backgroundColor = Math.random() > 0.5 ? 'pink' : 'lightblue';
-      shape.style.left = Math.random() * window.innerWidth + 'px';
-      shape.style.top = Math.random() * window.innerHeight + 'px';
-      shape.style.animationDuration = (5 + Math.random() * 10) + 's';
-      document.body.appendChild(shape);
-    }
-  }
-
+// Vote function
+function vote(gender, event) {
+  votes[gender]++;
+  localStorage.setItem(gender, votes[gender]);
   updateResults();
-  createBackgroundShapes();
+  triggerConfetti(event);
+  updateOdds();
+}
+
+// Password-protected reset
+function resetVotes() {
+  const input = prompt("Enter password to reset votes:");
+  if (input === PASSWORD) {
+    votes.boy = 0;
+    votes.girl = 0;
+    localStorage.setItem('boy', 0);
+    localStorage.setItem('girl', 0);
+    updateResults();
+    oddsHistory.boy = [];
+    oddsHistory.girl = [];
+    updateOdds();
+    alert("Votes have been reset!");
+  } else {
+    alert("Wrong password! ❌");
+  }
+}
+
+// Background shapes
+function createBackgroundShapes() {
+  for (let i = 0; i < 20; i++) {
+    const shape = document.createElement('div');
+    shape.className = 'bg-shape';
+    shape.style.width = shape.style.height = (20 + Math.random() * 40) + 'px';
+    shape.style.backgroundColor = Math.random() > 0.5 ? 'pink' : 'lightblue';
+    shape.style.left = Math.random() * window.innerWidth + 'px';
+    shape.style.top = Math.random() * window.innerHeight + 'px';
+    shape.style.animationDuration = (5 + Math.random() * 10) + 's';
+    document.body.appendChild(shape);
+  }
+}
+
+// Odds calculation & trending chart
+let oddsHistory = { boy: [], girl: [] };
+
+function updateOdds() {
+  const total = votes.boy + votes.girl;
+  if(total === 0) return;
+
+  // Simple bookmaker odds with random fluctuation
+  let boyOdd = ((total / votes.boy) || 1) * (0.9 + Math.random() * 0.2);
+  let girlOdd = ((total / votes.girl) || 1) * (0.9 + Math.random() * 0.2);
+
+  document.getElementById('boy-odds').textContent = boyOdd.toFixed(2);
+  document.getElementById('girl-odds').textContent = girlOdd.toFixed(2);
+
+  oddsHistory.boy.push(boyOdd);
+  oddsHistory.girl.push(girlOdd);
+
+  if(oddsHistory.boy.length > 50) { // keep last 50 points
+    oddsHistory.boy.shift();
+    oddsHistory.girl.shift();
+  }
+
+  drawOddsChart();
+}
+
+function drawOddsChart() {
+  const canvas = document.getElementById('oddsChart');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const allOdds = oddsHistory.boy.concat(oddsHistory.girl);
+  const maxOdd = Math.max(...allOdds) * 1.2;
+  const minOdd = Math.min(...allOdds) * 0.8;
+
+  // Boy line
+  ctx.beginPath();
+  ctx.strokeStyle = 'blue';
+  oddsHistory.boy.forEach((o, i) => {
+    const x = (i / oddsHistory.boy.length) * canvas.width;
+    const y = canvas.height - ((o - minOdd)/(maxOdd - minOdd)) * canvas.height;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Girl line
+  ctx.beginPath();
+  ctx.strokeStyle = 'pink';
+  oddsHistory.girl.forEach((o, i) => {
+    const x = (i / oddsHistory.girl.length) * canvas.width;
+    const y = canvas.height - ((o - minOdd)/(maxOdd - minOdd)) * canvas.height;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+
+// Initialize app
+updateResults();
+createBackgroundShapes();
+updateOdds();
 </script>
 </body>
 </html>
