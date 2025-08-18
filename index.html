@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gender Reveal Vote</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
+    #results { margin-top: 30px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>What's the Gender?</h1>
+  <p>Cast your vote!</p>
+  
+  <button onclick="vote('boy')">💙 Boy</button>
+  <button onclick="vote('girl')">💖 Girl</button>
+  
+  <div id="results">
+    Boys: <span id="boy-count">0</span> |
+    Girls: <span id="girl-count">0</span>
+  </div>
+
+  <script>
+    // Load existing votes from localStorage
+    const votes = {
+      boy: parseInt(localStorage.getItem('boy')) || 0,
+      girl: parseInt(localStorage.getItem('girl')) || 0
+    };
+
+    const boyCountEl = document.getElementById('boy-count');
+    const girlCountEl = document.getElementById('girl-count');
+
+    function updateResults() {
+      boyCountEl.textContent = votes.boy;
+      girlCountEl.textContent = votes.girl;
+    }
+
+    function vote(gender) {
+      votes[gender]++;
+      localStorage.setItem(gender, votes[gender]);
+      updateResults();
+      alert(`Thanks for voting ${gender === 'boy' ? '💙Boy' : '💖Girl'}!`);
+    }
+
+    updateResults();
+  </script>
+</body>
+</html>
