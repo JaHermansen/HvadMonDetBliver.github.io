@@ -1,303 +1,366 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spil på Antons barn og vind store præmier!</title>
-<style>
-  body { 
-    font-family: Arial, sans-serif; 
-    text-align: center; 
-    padding: 50px; 
-    position: relative; 
-    overflow: hidden; 
-    background: #fff;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Michael's Gender Reveal Bets 🎉</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffb6c1, #add8e6);
+      color: #333;
+      text-align: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    input, button {
+      font-size: 1rem; padding: 0.6rem 1rem;
+      border-radius: 0.5rem; border: none; margin: 0.5rem;
+    }
+    button {
+      cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+    }
+    button:hover { transform: scale(1.05); opacity: 0.9; }
+    #boyBtn { background: #4fa3ff; color: white; }
+    #girlBtn { background: #ff69b4; color: white; }
+    #betSection { display: none; margin-bottom: 1.5rem; z-index: 1; position: relative; }
+    canvas { max-width: 400px; margin: 1.5rem auto; z-index: 1; position: relative; }
+    table {
+      width: 80%; margin: 1rem auto; border-collapse: collapse;
+      background: rgba(255,255,255,0.8); border-radius: 1rem; overflow: hidden;
+      z-index: 1; position: relative;
+    }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; }
+    th { background-color: #f4f4f4; }
+    #loginSection {
+      background: rgba(255,255,255,0.8);
+      padding: 1rem 2rem;
+      border-radius: 1rem;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      z-index: 1; position: relative;
+    }
 
-  h1 { font-size: 2em; margin-bottom: 5px; }
-  h2 { color: #555; margin-bottom: 20px; }
+    /* Floating background text */
+    #floating-text-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .floating-text {
+      position: absolute;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: rgba(255, 105, 180, 0.3);
+      animation: floatText linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes floatText {
+      from {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      to {
+        transform: translateY(-10vh) rotate(10deg);
+        opacity: 0;
+      }
+    }
 
-  button { 
-    padding: 10px 20px; 
-    font-size: 18px; 
-    margin: 10px; 
-    cursor: pointer; 
-    z-index: 2;
-    position: relative;
-  }
+    /* Side banners */
+    .side-banner {
+      position: fixed;
+      top: 20%;
+      width: 120px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 1rem;
+      text-align: center;
+      padding: 1rem 0.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      animation: float 3s ease-in-out infinite;
+      z-index: 999;
+    }
+    .side-banner.left { left: 0.5rem; }
+    .side-banner.right { right: 0.5rem; }
 
-  #results, #odds-display {
-    margin-top: 20px; 
-    font-size: 20px; 
-    z-index: 2;
-    position: relative;
-  }
+    .ad-baby {
+      font-size: 2.5rem;
+      animation: cry 1s alternate infinite;
+    }
+    .ad-text {
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: 0.5rem;
+    }
 
-  .confetti { 
-    position: absolute; 
-    width: 10px; 
-    height: 10px; 
-    pointer-events: none;
-    animation: fall 1s linear forwards;
-    z-index: 2;
-  }
+    @keyframes cry {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px) rotate(-5deg); }
+    }
 
-  @keyframes fall {
-    to { transform: translateY(500px) rotate(360deg); opacity: 0; }
-  }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
 
-  /* Baggrundsfigurer */
-  .bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.5;
-    animation: float 10s linear infinite;
-  }
-  @keyframes float {
-    0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
-    100% { transform: translateY(-100px) translateX(100px) rotate(360deg); }
-  }
-
-  /* Flydende ordsprog */
-  .floating-saying {
-    position: absolute;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: rgba(0,0,0,0.2);
-    white-space: nowrap;
-    user-select: none;
-    pointer-events: none;
-    animation: floatSaying linear infinite;
-  }
-  @keyframes floatSaying {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(110vw); }
-  }
-
-  canvas { 
-    border: 1px solid #ccc; 
-    margin-top: 20px; 
-    z-index: 1;
-    position: relative;
-  }
-
-  /* Betting bannere */
-  .banner {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: white;
-    padding: 10px 20px;
-    background: linear-gradient(90deg, #ff69b4, #1e90ff);
-    border-radius: 15px;
-    margin: 10px auto;
-    display: inline-block;
-    z-index: 2;
-    position: relative;
-  }
-
-</style>
+    @media (max-width: 600px) {
+      .side-banner { display: none; }
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>🎉 Spil på Antons barn og vind store præmier! 🎉</h1>
-<h2>Gæt på dreng eller pige!</h2>
+  <!-- Floating Background Text -->
+  <div id="floating-text-container"></div>
 
-<div class="banner">Sæt dine penge NU! 💰</div>
+  <!-- Side Banners -->
+  <div class="side-banner left">
+    <div class="ad-baby">👶😭</div>
+    <div class="ad-text">Bet on<br><strong>Boy</strong>?</div>
+  </div>
 
-<button onclick="vote('boy', event)">💙 Spil på Dreng</button>
-<button onclick="vote('girl', event)">💖 Spil på Pige</button>
-<button onclick="resetVotes()">🔄 Nulstil Stemmer</button>
+  <div class="side-banner right">
+    <div class="ad-baby">👶😭</div>
+    <div class="ad-text">Or is it<br><strong>Girl</strong>?</div>
+  </div>
 
-<div id="results">
-  Drenges stemmer: <span id="boy-count">0</span> |
-  Piges stemmer: <span id="girl-count">0</span> |
-  Samlet antal stemmer: <span id="total-count">0</span>
-</div>
+  <!-- Header -->
+  <header style="background:#222; color:#fff; padding:1rem;">
+    <h2>💰 Michael's Reveal Bets – Play for Fun Only 💰</h2>
+    <p style="margin:0; font-size:0.9rem;">1000 Free Tokens on Signup! | Odds purely for entertainment | No real money involved</p>
+  </header>
 
-<div id="odds-display">
-  Odds: 💙 Dreng: <span id="boy-odds">1.0</span> | 💖 Pige: <span id="girl-odds">1.0</span>
-</div>
+  <!-- Fake ad bar -->
+  <div id="adBar" style="
+    display:flex; justify-content:center; gap:1rem;
+    background:#333; color:#fff; padding:0.5rem; flex-wrap:wrap;
+  ">
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🎉 Special Reveal Bonus Tokens!</div>
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🔥 Bet Trends: 60% Girl | 40% Boy</div>
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">💎 VIP Mode Unlocks Soon!</div>
+  </div>
 
-<canvas id="oddsChart" width="500" height="200"></canvas>
+  <!-- Login Section -->
+  <div id="loginSection">
+    <h2>Want to Place a Bet?</h2>
+    <p>Please confirm your age and enter your name:</p>
+    <label>
+      <input type="checkbox" id="ageCheck"> I am 18 years or older
+    </label><br>
+    <input type="text" id="userName" placeholder="Enter your name" /><br>
+    <button id="startBtn">Start Betting</button>
+  </div>
 
-<script>
-const PASSWORD = "KunDrenge";
+  <!-- Betting Section -->
+  <div id="betSection">
+    <h2>Welcome, <span id="displayName"></span>!</h2>
+    <p>You have <strong id="tokenCount">1000</strong> tokens.</p>
+    <input type="number" id="betAmount" min="1" placeholder="Enter tokens to bet" />
+    <div>
+      <button id="boyBtn">👶 Bet on Boy</button>
+      <button id="girlBtn">🎀 Bet on Girl</button>
+    </div>
+    <button id="logoutBtn" style="margin-top: 1rem;">Log out</button>
+  </div>
 
-const votes = {
-  boy: parseInt(localStorage.getItem('boy')) || 0,
-  girl: parseInt(localStorage.getItem('girl')) || 0
-};
+  <!-- Chart + Leaderboard -->
+  <div id="chartSection">
+    <canvas id="chart"></canvas>
+    <div id="results"></div>
+    <h3>Current Bettors</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Bet On</th>
+          <th>Amount</th>
+          <th>Remaining Tokens</th>
+        </tr>
+      </thead>
+      <tbody id="bettorsTable"></tbody>
+    </table>
+  </div>
 
-const boyCountEl = document.getElementById('boy-count');
-const girlCountEl = document.getElementById('girl-count');
-const totalCountEl = document.getElementById('total-count');
+  <!-- Floating Background Script -->
+  <script>
+    const phrases = [
+      "No more sleep 😴",
+      "Crying baby incoming 👶😭",
+      "Say goodbye to free time 🕒",
+      "Diapers. Everywhere. 💩",
+      "No more Netflix binges 📺",
+      "Goodbye social life 👋",
+      "Hope you like lullabies 🎶",
+      "Baby proof everything 🍼",
+      "Endless laundry 🧺",
+      "Get ready for chaos! 🤪"
+    ];
+    const container = document.getElementById("floating-text-container");
 
-function updateResults() {
-  boyCountEl.textContent = votes.boy;
-  girlCountEl.textContent = votes.girl;
-  totalCountEl.textContent = votes.boy + votes.girl;
-}
+    function createFloatingText() {
+      const text = document.createElement("div");
+      text.className = "floating-text";
+      text.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+      text.style.left = Math.random() * 90 + "vw";
+      text.style.animationDuration = (10 + Math.random() * 10) + "s";
+      text.style.fontSize = (1 + Math.random() * 1.5) + "rem";
+      text.style.color = Math.random() > 0.5
+        ? "rgba(135,206,235,0.3)"
+        : "rgba(255,105,180,0.3)";
+      container.appendChild(text);
+      setTimeout(() => container.removeChild(text), 20000);
+    }
 
-// Confetti animation
-function triggerConfetti(event) {
-  for (let i = 0; i < 30; i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-    confetti.style.left = (event.clientX + Math.random() * 50 - 25) + 'px';
-    confetti.style.top = (event.clientY + Math.random() * 50 - 25) + 'px';
-    confetti.style.width = confetti.style.height = (5 + Math.random() * 10) + 'px';
-    document.body.appendChild(confetti);
-    setTimeout(() => confetti.remove(), 1000);
-  }
-}
+    setInterval(createFloatingText, 1500);
+  </script>
 
-// Vote function
-function vote(gender, event) {
-  votes[gender]++;
-  localStorage.setItem(gender, votes[gender]);
-  updateResults();
-  triggerConfetti(event);
-  generateTargetOdds();
-  updateBackgroundColors();
-}
+  <!-- Main Betting Logic -->
+  <script>
+    const USERS_KEY = 'genderRevealUsers';
+    const VOTES_KEY = 'genderRevealVotes';
+    let votes = JSON.parse(localStorage.getItem(VOTES_KEY)) || { boy: 0, girl: 0 };
+    let users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+    let currentUser = null;
 
-// Password-protected reset
-function resetVotes() {
-  const input = prompt("Indtast adgangskode for at nulstille stemmer:");
-  if (input === PASSWORD) {
-    votes.boy = 0;
-    votes.girl = 0;
-    localStorage.setItem('boy', 0);
-    localStorage.setItem('girl', 0);
-    updateResults();
-    oddsHistory.boy = [];
-    oddsHistory.girl = [];
-    targetOdds.boy = 1;
-    targetOdds.girl = 1;
-    alert("Stemmerne er nulstillet!");
-    updateBackgroundColors();
-  } else {
-    alert("Forkert adgangskode! ❌");
-  }
-}
+    const loginSection = document.getElementById('loginSection');
+    const betSection = document.getElementById('betSection');
+    const chartSection = document.getElementById('chartSection');
+    const tokenCount = document.getElementById('tokenCount');
+    const displayName = document.getElementById('displayName');
+    const betAmount = document.getElementById('betAmount');
+    const bettorsTable = document.getElementById('bettorsTable');
+    const ctx = document.getElementById('chart').getContext('2d');
 
-// Baggrundsfigurer der reagerer på stemmetendenser
-function createBackgroundShapes() {
-  for (let i = 0; i < 30; i++) {
-    const shape = document.createElement('div');
-    shape.className = 'bg-shape';
-    shape.style.width = shape.style.height = (20 + Math.random() * 40) + 'px';
-    shape.style.left = Math.random() * window.innerWidth + 'px';
-    shape.style.top = Math.random() * window.innerHeight + 'px';
-    shape.style.animationDuration = (5 + Math.random() * 10) + 's';
-    document.body.appendChild(shape);
-  }
-}
+    const chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Boy', 'Girl'],
+        datasets: [{
+          data: [votes.boy, votes.girl],
+          backgroundColor: ['#4fa3ff', '#ff69b4']
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: true, text: 'Total Tokens Bet' }
+        }
+      }
+    });
 
-function updateBackgroundColors() {
-  const shapes = document.querySelectorAll('.bg-shape');
-  const total = votes.boy + votes.girl || 1;
-  const boyRatio = votes.boy / total;
-  shapes.forEach(shape => {
-    shape.style.backgroundColor = Math.random() < boyRatio ? 'lightblue' : 'pink';
-  });
-}
+    function updateDisplay() {
+      chart.data.datasets[0].data = [votes.boy, votes.girl];
+      chart.update();
 
-// Flydende danske ordsprog
-const sayings = [
-  "Uha hvad mon det bliver?",
-  "Kommer der en mand ind, kommer der en mand ud",
-  "Kun rigtige mænd får drenge",
-  "Hvem gætter rigtigt?",
-  "Pink eller blå, gæt med!",
-  "Er det en lille prins eller en lille diva?",
-  "Kun de modige tør satse på drenge!",
-  "Pigerne tager over – eller gør de?",
-  "Sæt dine penge på noget blødt og lyserødt!",
-  "Blå blod eller pink galskab?",
-  "Baby er på vej – og du kan vinde stort!",
-  "Hvem får flest lykke-stjerner: dreng eller pige?",
-  "Er du drenge-guru eller pige-profet?",
-  "Hvis du gætter forkert, må du rydde bleerne!",
-  "Kun de kloge ser fremtiden… og barnet!"
-];
+      const total = votes.boy + votes.girl;
+      const boyPct = total ? ((votes.boy / total) * 100).toFixed(1) : 0;
+      const girlPct = total ? ((votes.girl / total) * 100).toFixed(1) : 0;
+      document.getElementById('results').textContent =
+        `Boy: ${boyPct}% (${votes.boy}) | Girl: ${girlPct}% (${votes.girl})`;
 
+      bettorsTable.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.bet ? u.bet.choice : '-'}</td>
+          <td>${u.bet ? u.bet.amount : '-'}</td>
+          <td>${u.tokens}</td>
+        </tr>
+      `).join('');
+    }
 
-function createFloatingSayings() {
-  sayings.forEach(text => {
-    const span = document.createElement('div');
-    span.className = 'floating-saying';
-    span.textContent = text;
-    span.style.top = Math.random() * window.innerHeight + 'px';
-    span.style.animationDuration = (20 + Math.random()*20) + 's';
-    span.style.fontSize = (16 + Math.random()*20) + 'px';
-    document.body.appendChild(span);
-  });
-}
+    function saveAll() {
+      localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
 
-// Oddsberegning & trending diagram
-let oddsHistory = { boy: [], girl: [] };
-let currentOdds = { boy: 1, girl: 1 };
-let targetOdds = { boy: 1, girl: 1 };
+    document.getElementById('startBtn').onclick = () => {
+      const name = document.getElementById('userName').value.trim();
+      const isAdult = document.getElementById('ageCheck').checked;
+      if (!isAdult) return alert('You must be 18 or older to participate.');
+      if (!name) return alert('Please enter your name.');
 
-function generateTargetOdds() {
-  const total = votes.boy + votes.girl;
-  if(total === 0) return;
-  targetOdds.boy = ((total / votes.boy) || 1) * (0.9 + Math.random() * 0.2);
-  targetOdds.girl = ((total / votes.girl) || 1) * (0.9 + Math.random() * 0.2);
-}
+      let user = users.find(u => u.name.toLowerCase() === name.toLowerCase());
+      if (!user) { user = { name, tokens: 1000, bet: null }; users.push(user); }
 
-function animateOdds() {
-  const smoothing = 0.05;
-  currentOdds.boy += (targetOdds.boy - currentOdds.boy) * smoothing;
-  currentOdds.girl += (targetOdds.girl - currentOdds.girl) * smoothing;
+      currentUser = user;
+      displayName.textContent = currentUser.name;
+      tokenCount.textContent = currentUser.tokens;
+      loginSection.style.display = 'none';
+      betSection.style.display = 'block';
+      updateDisplay();
+    };
 
-  document.getElementById('boy-odds').textContent = currentOdds.boy.toFixed(2);
-  document.getElementById('girl-odds').textContent = currentOdds.girl.toFixed(2);
+    document.getElementById('logoutBtn').onclick = () => {
+      currentUser = null;
+      betSection.style.display = 'none';
+      loginSection.style.display = 'inline-block';
+      document.getElementById('userName').value = '';
+      document.getElementById('ageCheck').checked = false;
+    };
 
-  oddsHistory.boy.push(currentOdds.boy);
-  oddsHistory.girl.push(currentOdds.girl);
+    function placeBet(choice) {
+      if (!currentUser) return alert('Please sign in first!');
+      const amount = parseInt(betAmount.value);
+      if (isNaN(amount) || amount <= 0) return alert('Enter a valid bet amount.');
+      if (amount > currentUser.tokens) return alert('Not enough tokens!');
 
-  if(oddsHistory.boy.length > 100) {
-    oddsHistory.boy.shift();
-    oddsHistory.girl.shift();
-  }
+      currentUser.tokens -= amount;
+      currentUser.bet = { choice, amount };
+      votes[choice] += amount;
 
-  drawChart();
-  requestAnimationFrame(animateOdds);
-}
+      const idx = users.findIndex(u => u.name === currentUser.name);
+      if (idx >= 0) users[idx] = currentUser;
 
-// Simple canvas line chart
-const canvas = document.getElementById('oddsChart');
-const ctx = canvas.getContext('2d');
+      saveAll();
+      tokenCount.textContent = currentUser.tokens;
+      betAmount.value = '';
+      updateDisplay();
+    }
 
-function drawChart() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawLine(oddsHistory.boy, 'blue');
-  drawLine(oddsHistory.girl, 'pink');
-}
+    document.getElementById('boyBtn').onclick = () => placeBet('boy');
+    document.getElementById('girlBtn').onclick = () => placeBet('girl');
 
-function drawLine(history, color) {
-  ctx.beginPath();
-  history.forEach((val, i) => {
-    const x = i / 100 * canvas.width;
-    const y = canvas.height - (val / 5 * canvas.height);
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  });
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
+    loginSection.style.display = 'inline-block';
+    chartSection.style.display = 'block';
+    betSection.style.display = 'none';
+    updateDisplay();
+  </script>
 
-// Initialize
-updateResults();
-createBackgroundShapes();
-updateBackgroundColors();
-createFloatingSayings();
-animateOdds();
-</script>
+  <!-- Bottom Ticker -->
+  <div id="ticker" style="
+    position:fixed; bottom:0; left:0; width:100%;
+    background:#111; color:#fff; padding:0.3rem;
+    font-size:1rem; white-space:nowrap; overflow:hidden;
+  ">
+    <span id="tickerText"></span>
+  </div>
+
+  <script>
+    const headlines = [
+      "Breaking: Aunt Sarah doubles down on Girl!",
+      "Uncle Tom hedges 500 on Boy!",
+      "Grandma says 'It’s definitely twins!'",
+      "VIP bonus: +100 tokens for early guesses!",
+      "Reveal countdown underway… stay tuned!"
+    ];
+    let i = 0;
+    const tickerText = document.getElementById('tickerText');
+    function rotateTicker() {
+      tickerText.textContent = headlines[i];
+      i = (i + 1) % headlines.length;
+    }
+    rotateTicker();
+    setInterval(rotateTicker, 3000);
+  </script>
 
 </body>
 </html>
