@@ -357,6 +357,43 @@
     }
     rotateTicker();
     setInterval(rotateTicker, 3000);
+
+    const API_URL = '/api/bets';
+
+    // Fetch all bets from the server
+    async function fetchBets() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      users = data; // Update the local users array
+      updateDisplay();
+    }
+
+    // Submit a new bet to the server
+    async function submitBet(name, choice, amount) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, choice, amount }),
+      });
+      if (response.ok) {
+        fetchBets(); // Refresh the bets after adding a new one
+      } else {
+        alert('Failed to place bet');
+      }
+    }
+
+    // Update the `placeBet` function to use the backend
+    async function placeBet(choice) {
+      if (!currentUser) return alert('Log venligst ind først!');
+      const amount = parseInt(betAmount.value);
+      if (isNaN(amount) || amount <= 0) return alert('Indtast et gyldigt væddemålsbeløb.');
+      if (amount > currentUser.tokens) return alert('Du har ikke nok tokens!');
+      currentUser.tokens -= amount;
+      currentUser.bet = { choice, amount };
+      await submitBet(currentUser.name, choice, amount); // Send the bet to the server
+      tokenCount.textContent = currentUser.tokens;
+      betAmount.value = '';
+    }
   </script>
 </body>
 </html>
