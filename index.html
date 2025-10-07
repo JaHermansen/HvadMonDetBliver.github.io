@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Michael's Gender Reveal Bets 🎉</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Michaels Gender Betting 🎉</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -19,18 +19,15 @@
       font-size: 1rem; padding: 0.6rem 1rem;
       border-radius: 0.5rem; border: none; margin: 0.5rem;
     }
-    button {
-      cursor: pointer; transition: transform 0.2s, opacity 0.2s;
-    }
+    button { cursor: pointer; transition: transform 0.2s, opacity 0.2s; }
     button:hover { transform: scale(1.05); opacity: 0.9; }
     #boyBtn { background: #4fa3ff; color: white; }
     #girlBtn { background: #ff69b4; color: white; }
-    #betSection { display: none; margin-bottom: 1.5rem; z-index: 1; position: relative; }
-    canvas { max-width: 400px; margin: 1.5rem auto; z-index: 1; position: relative; }
+    #betSection { display: none; margin-bottom: 1.5rem; }
+    canvas { max-width: 400px; margin: 1.5rem auto; }
     table {
       width: 80%; margin: 1rem auto; border-collapse: collapse;
       background: rgba(255,255,255,0.8); border-radius: 1rem; overflow: hidden;
-      z-index: 1; position: relative;
     }
     th, td { border: 1px solid #ddd; padding: 0.5rem; }
     th { background-color: #f4f4f4; }
@@ -40,42 +37,29 @@
       border-radius: 1rem;
       display: inline-block;
       margin-bottom: 1.5rem;
-      z-index: 1; position: relative;
     }
 
-    /* Floating background text */
-    #floating-text-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
+    /* Flydende baggrundstekst */
     .floating-text {
-      position: absolute;
+      position: fixed;
       font-size: 1.2rem;
       font-weight: bold;
-      color: rgba(255, 105, 180, 0.3);
-      animation: floatText linear infinite;
+      color: rgba(0, 0, 0, 0.1);
       white-space: nowrap;
-    }
-    @keyframes floatText {
-      from {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
-      10% { opacity: 0.8; }
-      90% { opacity: 0.8; }
-      to {
-        transform: translateY(-10vh) rotate(10deg);
-        opacity: 0;
-      }
+      pointer-events: none;
+      animation: floatText 20s linear infinite;
+      z-index: 0;
     }
 
-    /* Side banners */
+    @keyframes floatText {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-10vh) translateX(20vw); opacity: 0; }
+    }
+
+    /* Sidebannere */
     .side-banner {
       position: fixed;
       top: 20%;
@@ -111,122 +95,96 @@
       50% { transform: translateY(-8px); }
     }
 
+    /* Nedtælling */
+    #countdown {
+      font-size: 5em; /* Gør nedtællingen større */
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.8); /* Flet det ind i baggrunden */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1; /* Flyt det bagved andre elementer */
+      user-select: none; /* Gør det umuligt at markere */
+      pointer-events: none; /* Forhindrer interaktion */
+    }
+
     @media (max-width: 600px) {
       .side-banner { display: none; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- Floating Background Text -->
-  <div id="floating-text-container"></div>
+  <!-- Flydende anti-forældreskab beskeder -->
+  <div class="floating-text" style="left:10%;">Ingen mere søvn 😩</div>
+  <div class="floating-text" style="left:30%; animation-delay:3s;">Grædende baby 👶😭</div>
+  <div class="floating-text" style="left:60%; animation-delay:6s;">Farvel fritid 🕒</div>
+  <div class="floating-text" style="left:80%; animation-delay:9s;">Ingen flere penge 💸</div>
+  <div class="floating-text" style="left:40%; animation-delay:12s;">Uendelige bleer 💩</div>
 
-  <!-- Side Banners -->
+  <!-- Sidebannere -->
   <div class="side-banner left">
     <div class="ad-baby">👶😭</div>
-    <div class="ad-text">Bet on<br><strong>Boy</strong>?</div>
+    <div class="ad-text">Spil på<br><strong>Mandesvin</strong>?</div>
   </div>
 
   <div class="side-banner right">
     <div class="ad-baby">👶😭</div>
-    <div class="ad-text">Or is it<br><strong>Girl</strong>?</div>
+    <div class="ad-text">Eller er det<br><strong>Tøs</strong>?</div>
   </div>
 
-  <!-- Header -->
   <header style="background:#222; color:#fff; padding:1rem;">
-    <h2>💰 Michael's Reveal Bets – Play for Fun Only 💰</h2>
-    <p style="margin:0; font-size:0.9rem;">1000 Free Tokens on Signup! | Odds purely for entertainment | No real money involved</p>
+    <h2>💰 Michaels Gender Reveal Live-Bet💰</h2>
+    <p style="margin:0; font-size:0.9rem;">1000 Gratis Tokens ved Tilmelding! | Odds kun for seriøse oddsere | Tokens afrenges efter afgørelse</p>
   </header>
 
-  <!-- Fake ad bar -->
-  <div id="adBar" style="
-    display:flex; justify-content:center; gap:1rem;
-    background:#333; color:#fff; padding:0.5rem; flex-wrap:wrap;
-  ">
-    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🎉 Special Reveal Bonus Tokens!</div>
-    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🔥 Bet Trends: 60% Girl | 40% Boy</div>
-    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">💎 VIP Mode Unlocks Soon!</div>
+  <!-- Nedtælling -->
+  <div id="countdown">⏳ Afsløring om: beregner...</div>
+
+  <!-- Falsk annoncebjælke -->
+  <div id="adBar" style="display:flex; justify-content:center; gap:1rem; background:#333; color:#fff; padding:0.5rem; flex-wrap:wrap;">
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🎉 Klik Og Få Dine Bonus Tokens!</div>
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">🔥 Væddemål Trends: 60% Pige | 40% Dreng</div>
+    <div style="background:#444; padding:0.5rem 1rem; border-radius:0.5rem;">💎 VIP Mode Låses Op Snart!</div>
   </div>
 
-  <!-- Login Section -->
+  <!-- Login -->
   <div id="loginSection">
-    <h2>Want to Place a Bet?</h2>
-    <p>Please confirm your age and enter your name:</p>
-    <label>
-      <input type="checkbox" id="ageCheck"> I am 18 years or older
-    </label><br>
-    <input type="text" id="userName" placeholder="Enter your name" /><br>
-    <button id="startBtn">Start Betting</button>
+    <h2>Vil du Placere et bet?</h2>
+    <p>Bekræft venligst din alder og indtast dit navn:</p>
+    <label><input type="checkbox" id="ageCheck"> Jeg er 18 år eller ældre</label><br>
+    <input type="text" id="userName" placeholder="Indtast dit navn" /><br>
+    <button id="startBtn">Start Bet</button>
   </div>
 
-  <!-- Betting Section -->
+  <!-- Væddemålssektion -->
   <div id="betSection">
-    <h2>Welcome, <span id="displayName"></span>!</h2>
-    <p>You have <strong id="tokenCount">1000</strong> tokens.</p>
-    <input type="number" id="betAmount" min="1" placeholder="Enter tokens to bet" />
+    <h2>Velkommen, <span id="displayName"></span>!</h2>
+    <p>Du har <strong id="tokenCount">1000</strong> tokens.</p>
+    <input type="number" id="betAmount" min="1" placeholder="Indtast tokens at vædde" />
     <div>
-      <button id="boyBtn">👶 Bet on Boy</button>
-      <button id="girlBtn">🎀 Bet on Girl</button>
+      <button id="boyBtn">👶 Spil på Dreng</button>
+      <button id="girlBtn">🎀 Spil på Pige</button>
     </div>
-    <button id="logoutBtn" style="margin-top: 1rem;">Log out</button>
+    <button id="logoutBtn" style="margin-top: 1rem;">Log ud</button>
   </div>
 
-  <!-- Chart + Leaderboard -->
+  <!-- Diagram -->
   <div id="chartSection">
     <canvas id="chart"></canvas>
     <div id="results"></div>
-    <h3>Current Bettors</h3>
+    <h3>Nuværende Spillere</h3>
     <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Bet On</th>
-          <th>Amount</th>
-          <th>Remaining Tokens</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Navn</th><th>Spil På</th><th>Beløb</th><th>Resterende Tokens</th></tr></thead>
       <tbody id="bettorsTable"></tbody>
     </table>
   </div>
 
-  <!-- Floating Background Script -->
-  <script>
-    const phrases = [
-      "No more sleep 😴",
-      "Crying baby incoming 👶😭",
-      "Say goodbye to free time 🕒",
-      "Diapers. Everywhere. 💩",
-      "No more Netflix binges 📺",
-      "Goodbye social life 👋",
-      "Hope you like lullabies 🎶",
-      "Baby proof everything 🍼",
-      "Endless laundry 🧺",
-      "Get ready for chaos! 🤪"
-    ];
-    const container = document.getElementById("floating-text-container");
-
-    function createFloatingText() {
-      const text = document.createElement("div");
-      text.className = "floating-text";
-      text.textContent = phrases[Math.floor(Math.random() * phrases.length)];
-      text.style.left = Math.random() * 90 + "vw";
-      text.style.animationDuration = (10 + Math.random() * 10) + "s";
-      text.style.fontSize = (1 + Math.random() * 1.5) + "rem";
-      text.style.color = Math.random() > 0.5
-        ? "rgba(135,206,235,0.3)"
-        : "rgba(255,105,180,0.3)";
-      container.appendChild(text);
-      setTimeout(() => container.removeChild(text), 20000);
-    }
-
-    setInterval(createFloatingText, 1500);
-  </script>
-
-  <!-- Main Betting Logic -->
   <script>
     const USERS_KEY = 'genderRevealUsers';
     const VOTES_KEY = 'genderRevealVotes';
+
     let votes = JSON.parse(localStorage.getItem(VOTES_KEY)) || { boy: 0, girl: 0 };
     let users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
     let currentUser = null;
@@ -242,38 +200,20 @@
 
     const chart = new Chart(ctx, {
       type: 'pie',
-      data: {
-        labels: ['Boy', 'Girl'],
-        datasets: [{
-          data: [votes.boy, votes.girl],
-          backgroundColor: ['#4fa3ff', '#ff69b4']
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { position: 'bottom' },
-          title: { display: true, text: 'Total Tokens Bet' }
-        }
-      }
+      data: { labels: ['Dreng', 'Pige'], datasets: [{ data: [votes.boy, votes.girl], backgroundColor: ['#4fa3ff','#ff69b4'] }] },
+      options: { plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Samlede Tokens Spillet' } } }
     });
 
     function updateDisplay() {
       chart.data.datasets[0].data = [votes.boy, votes.girl];
       chart.update();
-
       const total = votes.boy + votes.girl;
       const boyPct = total ? ((votes.boy / total) * 100).toFixed(1) : 0;
       const girlPct = total ? ((votes.girl / total) * 100).toFixed(1) : 0;
       document.getElementById('results').textContent =
-        `Boy: ${boyPct}% (${votes.boy}) | Girl: ${girlPct}% (${votes.girl})`;
-
+        `Dreng: ${boyPct}% (${votes.boy}) | Pige: ${girlPct}% (${votes.girl})`;
       bettorsTable.innerHTML = users.map(u => `
-        <tr>
-          <td>${u.name}</td>
-          <td>${u.bet ? u.bet.choice : '-'}</td>
-          <td>${u.bet ? u.bet.amount : '-'}</td>
-          <td>${u.tokens}</td>
-        </tr>
+        <tr><td>${u.name}</td><td>${u.bet ? u.bet.choice : '- '}</td><td>${u.bet ? u.bet.amount : '- '}</td><td>${u.tokens}</td></tr>
       `).join('');
     }
 
@@ -285,12 +225,10 @@
     document.getElementById('startBtn').onclick = () => {
       const name = document.getElementById('userName').value.trim();
       const isAdult = document.getElementById('ageCheck').checked;
-      if (!isAdult) return alert('You must be 18 or older to participate.');
-      if (!name) return alert('Please enter your name.');
-
+      if (!isAdult) return alert('Du skal være 18 år eller ældre for at deltage.');
+      if (!name) return alert('Indtast venligst dit navn.');
       let user = users.find(u => u.name.toLowerCase() === name.toLowerCase());
       if (!user) { user = { name, tokens: 1000, bet: null }; users.push(user); }
-
       currentUser = user;
       displayName.textContent = currentUser.name;
       tokenCount.textContent = currentUser.tokens;
@@ -308,18 +246,15 @@
     };
 
     function placeBet(choice) {
-      if (!currentUser) return alert('Please sign in first!');
+      if (!currentUser) return alert('Log venligst ind først!');
       const amount = parseInt(betAmount.value);
-      if (isNaN(amount) || amount <= 0) return alert('Enter a valid bet amount.');
-      if (amount > currentUser.tokens) return alert('Not enough tokens!');
-
+      if (isNaN(amount) || amount <= 0) return alert('Indtast et gyldigt væddemålsbeløb.');
+      if (amount > currentUser.tokens) return alert('Du har ikke nok tokens!');
       currentUser.tokens -= amount;
       currentUser.bet = { choice, amount };
       votes[choice] += amount;
-
       const idx = users.findIndex(u => u.name === currentUser.name);
       if (idx >= 0) users[idx] = currentUser;
-
       saveAll();
       tokenCount.textContent = currentUser.tokens;
       betAmount.value = '';
@@ -329,28 +264,90 @@
     document.getElementById('boyBtn').onclick = () => placeBet('boy');
     document.getElementById('girlBtn').onclick = () => placeBet('girl');
 
-    loginSection.style.display = 'inline-block';
-    chartSection.style.display = 'block';
-    betSection.style.display = 'none';
+    // Nedtælling (København)
+    const countdownEl = document.getElementById('countdown');
+    const target = new Date();
+    target.setDate(target.getDate() + ((5 - target.getDay() + 7) % 7)); // Næste fredag
+    target.setHours(20, 0, 0, 0);
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = target - now;
+      if (diff <= 0) {
+        countdownEl.textContent = "🎉 Afsløringen sker nu! 🎉";
+        return;
+      }
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      countdownEl.textContent = `⏳ Afsløring om: ${d}d ${h}t ${m}m ${s}s (København Tid)`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Vis diagram altid
     updateDisplay();
   </script>
 
-  <!-- Bottom Ticker -->
-  <div id="ticker" style="
-    position:fixed; bottom:0; left:0; width:100%;
-    background:#111; color:#fff; padding:0.3rem;
-    font-size:1rem; white-space:nowrap; overflow:hidden;
-  ">
+  <div id="ticker" style="position:fixed; bottom:0; left:0; width:100%; background:#111; color:#fff; padding:0.3rem; font-size:2rem; white-space:nowrap; overflow:hidden;">
     <span id="tickerText"></span>
   </div>
 
   <script>
     const headlines = [
-      "Breaking: Aunt Sarah doubles down on Girl!",
-      "Uncle Tom hedges 500 on Boy!",
-      "Grandma says 'It’s definitely twins!'",
-      "VIP bonus: +100 tokens for early guesses!",
-      "Reveal countdown underway… stay tuned!"
+    "Breaking: Mormor sætter alle sparepenge på tvillinger!",
+    "BREAKING – Barselsklinikker går konkurs på grund af vild væddemål!",
+    "VIP alert: +200 tokens for mest kreative navneforslag!",
+    "Først: Læger forudser kaos ved fødselsafdelingen!",
+    "Daddy Vanopslagh dobler indsatserne – Pige eller Dreng!",
+    "Pia Kjærsgaard anbefaler guldarmbånd som lykkeamulet til Pige!",
+    "BREAKING – Folk flokkes om ulovlige væddemål på hospitaler!",
+    "DF indfører officielle væddemålsdage i børnehaven!",
+    "Afsløringen starter om 3… 2… 1… spændingen stiger!",
+    "Tante Lise satser alt på Dreng – og taber alt!",
+    "BREAKING: Barselsvikarerne strejker efter væddemålsskandale!",
+    "Onkel Henrik forudser dobbelt Pige – med røde strømper!",
+    "VIP bonus: +500 tokens til den der gætter tvillinger først!",
+    "BREAKING – Folk kræver statsministerens mening om køn!",
+    "Morfar satser alt på Pige, for sikkerheds skyld!",
+    "Daddy Vanopslagh: 'Dette bliver historiens største væddemål!'",
+    "Pia Kjærsgaard deler råd om hårbånd til Pige – trending!",
+    "BREAKING: Hospitalet løber tør for bleer under væddemålet!",
+    "Tante Sarah ryster på hovedet: 'Dreng? Aldrig!'",
+    "Onkel Tom smider alle chips på Dreng – risikerer konkurs!",
+    "Bedstemor jubler: 'Tvillinger! Jeg sagde det jo!'",
+    "VIP alert: +50 tokens for sjoveste kommentar om baby!",
+    "BREAKING – Væddemålseksperter i panik over uventede resultater!",
+    "Daddy Vanopslagh mister alt på Pige – dramatisk!",
+    "Pia Kjærsgaard forudser Pige med politisk flair!",
+    "BREAKING – Folk deler teorier om køn på sociale medier!",
+    "DF vil regulere væddemål på hospitaler – kontroversielt!",
+    "Tante Lise køber ekstra snacks til Pige – sikker investering!",
+    "Onkel Henrik har hemmelige kilder på fødeafdelingen!",
+    "VIP bonus: +300 tokens til den med mest skandaløse gæt!",
+    "BREAKING – National debat om baby vs. bonus tokens!",
+    "Morfar erklærer: 'Dreng med blå strømper er vinderen!'",
+    "Daddy Vanopslagh udfordrer alle til live betting!",
+    "Pia Kjærsgaard lover autografer til Pige-supportere!",
+    "BREAKING – Barselsafdelingen lukker midlertidigt pga. hype!",
+    "Tante Sarah opdaterer Facebook: 'Pige eller Dreng? Stem nu!'",
+    "Onkel Tom satser dobbelt på tvillinger – ekstrem risiko!",
+    "Bedstemor udtaler: 'Dette er historiens største familievæddemål!'",
+    "VIP alert: +150 tokens til bedste meme om baby-gæt!",
+    "BREAKING – Aviser dækker væddemål som sport!",
+    "Daddy Vanopslagh går all-in på Dreng med hat!",
+    "Pia Kjærsgaard spår Pige med lange tasker – igen!",
+    "BREAKING – Politikere blander sig i hospitalets væddemål!",
+    "DF anbefaler nationale regler for baby betting!",
+    "Afslørings nedtælling i gang… spændingen er ubeskrivelig!",
+    "Tante Lise jubler: 'Tvillinger! Jeg havde ret!'",
+    "Onkel Henrik satser alt på Pige – dramatisk vending!",
+    "VIP bonus: +250 tokens til mest kreative baby-navn!",
+    "BREAKING – Væddemålseksperter i chok efter fødslen!",
+    "Daddy Vanopslagh smiler: 'Dette bliver min heldigste dag!'",
+    "Pia Kjærsgaard anbefaler amulet til sikker Pige-vind!"
+
     ];
     let i = 0;
     const tickerText = document.getElementById('tickerText');
@@ -361,6 +358,5 @@
     rotateTicker();
     setInterval(rotateTicker, 3000);
   </script>
-
 </body>
 </html>
